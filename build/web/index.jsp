@@ -29,12 +29,15 @@
             });
 
             setInterval(function () {
-                setTimeout(function () {
-                    GetDisconnect();
-                    setTimeout(function () {
-                        GetConnect();
-                    }, 1000);
-                }, 1000);
+                /*
+                 setTimeout(function () {
+                 GetDisconnect();
+                 setTimeout(function () {
+                 GetConnect();
+                 }, 1000);
+                 }, 1000);
+                 */
+                window.location.href = "index.jsp";
             }, refreshInterval);
 
 
