@@ -16,10 +16,10 @@
         <h1>Kingsbeam Connection Service</h1>
         <div id="responseLog"></div>
         <script>
-            var refreshInterval = 6 * 60 * 60 * 1000;
+            var refreshInterval = 1 * 60 * 60 * 1000;
 
             $(function () {
-                PrintLog("Startup", "Time interval:" + 6 + "hours");
+                PrintLog("Startup", "Time interval:" + 1 + "hours");
                 setTimeout(function () {
                     GetDisconnect();
                     setTimeout(function () {
