@@ -21,7 +21,7 @@
             $(function () {
                 PrintLog("Startup", "Time interval:" + 10 + "minutes");
                 setTimeout(function () {
-                    GetDisconnect();
+                    //GetDisconnect();
                     setTimeout(function () {
                         GetConnect();
                     }, 1000);
