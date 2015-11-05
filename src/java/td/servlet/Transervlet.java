@@ -50,9 +50,10 @@ public class Transervlet extends HttpServlet {
 
     static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     static final String DB_URL = "jdbc:mysql://localhost:3306/wulian?connectTimeout=3000";
+    static final String DB_URL_BMCP = "jdbc:mysql://localhost:3306/bmcp?connectTimeout=3000";
     //  Database credentials
-    static final String USER = "wulian";
-    static final String PASS = "wulian";
+    static final String USER = "kingsbeam";
+    static final String PASS = "kingsbeam30985441";
     private static final long serialVersionUID = 1L;
     ScheduledExecutorService scheduleService = new ScheduledThreadPoolExecutor(2);
     Runnable heartRunnable = null;
@@ -73,6 +74,7 @@ public class Transervlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         Connection conn = null;
+        Connection connBmcp = null;
         Statement stmt = null;
         ResultSet rs = null;
 
@@ -80,6 +82,7 @@ public class Transervlet extends HttpServlet {
             Class.forName("com.mysql.jdbc.Driver");
             System.out.println("Connecting to database...");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            connBmcp = DriverManager.getConnection(DB_URL_BMCP, USER, PASS);
 
             String strCmd = request.getParameter("cmd");//欲控制的功能
 
@@ -101,6 +104,10 @@ public class Transervlet extends HttpServlet {
                 //↓↓↓↓開始執行資料庫相關動作↓↓↓↓
                 stmt = conn.createStatement();
                 String strSql = "truncate table devices";
+                stmt.executeUpdate(strSql);
+
+                stmt = connBmcp.createStatement();
+                strSql = "truncate table devices";
                 stmt.executeUpdate(strSql);
 
                 if (NetSDK.isConnected(request.getParameter("strGwID"))) {
@@ -233,7 +240,7 @@ public class Transervlet extends HttpServlet {
                     System.out.println("連線GateWay成功" + ",gwID=" + gwID);
                 } else {
                     System.out.println("連線GateWay失敗");
-                    ;
+                    
                 }
 
             }
@@ -406,11 +413,13 @@ public class Transervlet extends HttpServlet {
             public void DeviceUp(DeviceInfo devInfo, Set<DeviceEPInfo> devEPInfoSet, boolean isFirst) {
                 String devID = devInfo.getDevID();
                 Connection conn = null;
+                Connection connBmcp = null;
                 Statement stmt = null;
                 ResultSet rs = null;
                 try {
                     java.util.Date now = new java.util.Date();
                     conn = DriverManager.getConnection(DB_URL, USER, PASS);
+                    connBmcp = DriverManager.getConnection(DB_URL_BMCP, USER, PASS);
                     String strDelSql = "delete from devices where devID = '" + devID + "'";
 
                     //origin code from JiaHuang
@@ -432,8 +441,14 @@ public class Transervlet extends HttpServlet {
                     stmt = conn.createStatement();
                     stmt.executeUpdate(strDelSql);
                     stmt.executeUpdate(strInsSql);
+
+                    stmt = connBmcp.createStatement();
+                    stmt.executeUpdate(strDelSql);
+                    stmt.executeUpdate(strInsSql);
+
                     stmt.close();
                     conn.close();
+                    connBmcp.close();
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 } catch (JSONException ex) {
@@ -471,6 +486,7 @@ public class Transervlet extends HttpServlet {
                 java.util.Date date = new java.util.Date();
 
                 Connection conn = null;
+                Connection connBmcp = null;
                 Statement stmt = null;
                 ResultSet rs = null;
 
@@ -495,6 +511,7 @@ public class Transervlet extends HttpServlet {
 
                 try {
                     conn = DriverManager.getConnection(DB_URL, USER, PASS);
+                    connBmcp = DriverManager.getConnection(DB_URL_BMCP, USER, PASS);
                     String strSql = "update devices set "
                             //
                             + "devDataText = '" + td.tools.DeviceTool.getDevDataText(devEPInfo.getEpType(), devEPInfo.getEpData(), devEPInfo.getEpStatus()) + "',"
@@ -506,6 +523,9 @@ public class Transervlet extends HttpServlet {
                             + "stopCtrlData  = '" + td.tools.DeviceTool.getStopOrDelayCtrlData(devType) + "' "
                             + "where devID ='" + devID + "'";
                     stmt = conn.createStatement();
+                    stmt.executeUpdate(strSql);
+                    
+                    stmt = connBmcp.createStatement();
                     stmt.executeUpdate(strSql);
 
                     //insert into  devices_data
